@@ -171,13 +171,28 @@ for (let name in json){
                      //continue=>ignora o restante das instruçoes e avança.
  if(field){
 
-  if(field.type == 'file') continue;
+//switch=>utiliza opçoes pré-definidas.
+  switch(field.type){
+  
+   case'file':
+  continue;
+   break;
 
-  field.value = json[name];
+   case'radio':
+       field = form.querySelector("[name=" + name.replace("_", "") + "][value="+json[name]+"]");
+       field.checked= true;
+   break;
+
+   case'checkbox':
+   field.checked = json[name];
+   break;
+    //default=> caso nenhuma expressão tenha executado.
+   default:
+    field.value = json[name];
+
+  }
 
  }
-
-
 //definir o valor                                       
 }
 
