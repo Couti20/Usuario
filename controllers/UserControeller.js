@@ -1,8 +1,9 @@
 class UserController {
     
-  constructor(formId, tableId){
+  constructor(formIdCreate, formIdUpdate,  tableId){
         //elemento
-    this.formEl = document.getElementById(formId);
+    this.formEl = document.getElementById(formIdCreate);
+    this.formUpdateEl = document.getElementById(formIdUpdate);
     this.tableEl = document.getElementById(tableId);
 
     this.onSubmit();
@@ -17,6 +18,41 @@ class UserController {
 
     });
 
+    this.formUpdateEl.addEventListener("submit", event => {
+      event.preventDefault();
+
+      let btn = this.formUpdateEl.querySelector("[type=submit]");
+
+      btn.disabled = true;
+
+      let values = this.getValues(this.formUpdateEl);
+
+     let index = this.formUpdateEl.dataset.trIndex;
+
+     let tr = this.tableEl.rows[index];
+
+     tr.dataset.user = JSON.stringify(values);
+
+     tr.innerHTML =  ` <tr>
+     <td>
+       <img src="${values.photo}" class="img-circle img-sm">
+     </td>
+     <td>${values.name}</td>
+     <td>${values.email}</td>
+     <td>${(values.admin)? 'Sim' : 'Não'}</td>
+     <td>${Ultils.dateFormat(values.register)}</td>
+     <td>
+       <button type="button" class="btn btn-primary btn-edit btn-xs btn-flat">Editar</button>
+       <button type="button" class="btn btn-danger btn-xs btn-flat">Excluir</button>
+     </td>
+   </tr>`;
+
+   this.addEventsTr(tr)
+
+   this.updateCount();   
+
+     
+    });
   }
 
 onSubmit(){
@@ -29,7 +65,7 @@ onSubmit(){
         let btn = this.formEl.querySelector("[type=submit]")
         btn.disabled = true;
           
-        let values = this.getValues();
+        let values = this.getValues(this.formEl);
 
         if(!values) return false;
                       //enão
@@ -90,13 +126,13 @@ getphoto(){
 
 
   //getValues = passa field por field.
-  getValues(){
+  getValues(formEl){
 //let so vai existir dentro getvalues    
     let user = {};
     let isValid = true;
 
 
-    [...this.formEl.elements].forEach(function(field, index){
+    [...formEl.elements].forEach(function(field, index){
                               //indeOf=>Realiza buscas dentro de um 'array'.
       if(['name', 'email', 'password'].indexOf(field.name) > -1 && !field.value){
         
@@ -137,7 +173,7 @@ getphoto(){
            user.photo,
             user.admin
             );
-          
+
   }
 
   addLine(dataUser) {
@@ -146,64 +182,71 @@ getphoto(){
 
     tr.dataset.user = JSON.stringify(dataUser);
 
-    tr.innerHTML =  ` <tr>
-    <td>
-      <img src="${dataUser.photo}" class="img-circle img-sm">
-    </td>
-    <td>${dataUser.name}</td>
-    <td>${dataUser.email}</td>
-    <td>${(dataUser.admin)? 'Sim' : 'Não'}</td>
-    <td>${Ultils.dateFormat(dataUser.register)}</td>
-    <td>
-      <button type="button" class="btn btn-primary btn-edit btn-xs btn-flat">Editar</button>
-      <button type="button" class="btn btn-danger btn-xs btn-flat">Excluir</button>
-    </td>
-  </tr>`;
+   tr.innerHTML = tr.innerHTML =  ` <tr>
+   <td>
+     <img src="${dataUser.photo}" class="img-circle img-sm">
+   </td>
+   <td>${dataUser.name}</td>
+   <td>${dataUser.email}</td>
+   <td>${(dataUser.admin)? 'Sim' : 'Não'}</td>
+   <td>${Ultils.dateFormat(dataUser.register)}</td>
+   <td>
+     <button type="button" class="btn btn-primary btn-edit btn-xs btn-flat">Editar</button>
+     <button type="button" class="btn btn-danger btn-xs btn-flat">Excluir</button>
+   </td>
+ </tr>`;
 
-  tr.querySelector(".btn-edit").addEventListener("click", e =>{
-let json = JSON.parse(tr.dataset.user);
-
-let form =  document.querySelector("#form-user-update")
-
-for (let name in json){
-                                      //replace=>troca por nada
- let field = form.querySelector("[name=" + name.replace("_", "") + "]");
-                     //continue=>ignora o restante das instruçoes e avança.
- if(field){
-
-//switch=>utiliza opçoes pré-definidas.
-  switch(field.type){
   
-   case'file':
-  continue;
-   break;
-
-   case'radio':
-       field = form.querySelector("[name=" + name.replace("_", "") + "][value="+json[name]+"]");
-       field.checked= true;
-   break;
-
-   case'checkbox':
-   field.checked = json[name];
-   break;
-    //default=> caso nenhuma expressão tenha executado.
-   default:
-    field.value = json[name];
-
-  }
-
- }
-//definir o valor                                       
-}
-
-   this.showPanelUpdate();
-
-
-  })
+  this.addEventsTr(tr);
              //como elemento, filho domelemento atual/appendch..
   this.tableEl.appendChild(tr);
 
   this.updateCount()
+
+}
+
+addEventsTr(tr){
+
+  tr.querySelector(".btn-edit").addEventListener("click", e =>{
+    let json = JSON.parse(tr.dataset.user);
+    
+    let form =  document.querySelector("#form-user-update");
+    
+    form.dataset.trIndex = tr.sectionRowIndex
+    
+    for (let name in json){
+                                          //replace=>troca por nada
+     let field = form.querySelector("[name=" + name.replace("_", "") + "]");
+                         //continue=>ignora o restante das instruçoes e avança.
+     if(field){
+    
+    //switch=>utiliza opçoes pré-definidas.
+      switch(field.type){
+      
+       case'file':
+      continue;
+       break;
+    
+       case'radio':
+           field = form.querySelector("[name=" + name.replace("_", "") + "][value="+json[name]+"]");
+           field.checked= true;
+       break;
+    
+       case'checkbox':
+       field.checked = json[name];
+       break;
+        //default=> caso nenhuma expressão tenha executado.
+       default:
+        field.value = json[name];
+    
+      }
+    
+     }
+    //definir o valor                                       
+    }
+
+    this.showPanelUpdate()
+});
 
 }
 
@@ -248,4 +291,4 @@ updateCount(){
 };
 
     
-
+  
