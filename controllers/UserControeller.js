@@ -5,7 +5,7 @@ class UserController {
     this.formEl = document.getElementById(formIdCreate);
     this.formUpdateEl = document.getElementById(formIdUpdate);
     this.tableEl = document.getElementById(tableId);
-
+  
     this.onSubmit();
     this.onEdit();
     this.selectAll();
@@ -195,23 +195,10 @@ getValues(formEl){
 
   }
     //armazenamento de usuario
-getUsersStorage(){
-
-    let users = [];
-
-    if (localStorage.getItem("users")){
-          //parse = interpletação.
-    users = JSON.parse(localStorage.getItem("users"));
-
-    }
-
-    return users;
-
-   }
 
 selectAll(){
      
-      let users = this.getUsersStorage();
+      let users = User.getUsersStorage();
 
       users.forEach(dataUser=> {
 
@@ -267,7 +254,13 @@ addEventsTr(tr){
   tr.querySelector(".btn-delete").addEventListener("click", e => {
    
     if(confirm("deseja realmente excluir ?")) {
-       
+
+      let user = new User();
+
+      user.loadFromJSON(JSON.parse(tr.dataset.user));
+      
+      user.remove();
+
       tr.remove();
 
       this.updateCount();

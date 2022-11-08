@@ -92,17 +92,21 @@ static getUsersStorage(){
 
     return users;
 
-   }
+   };
 
 getNewID(){
     
-    if(!window.id) window.id = 0;
+   let usersID = parseInt (localStorage.getItem("userID"));
+   
+    if(!usersID > 0 ) usersID = 0;
 
-    id++;
+    usersID++;
 
-    return this.id;
+    localStorage.setItem("userID", usersID);
+
+    return usersID;
      
-   }
+   };
 
 save(){
 
@@ -111,19 +115,19 @@ save(){
   if(this.id > 0 ){
 
      users.map(u=>{
-      
-      if(u._id === this.id){
 
-        u = this;
+      if(u._id == this.id){
 
-      };
+        Object.assign(u, this);
+
+      }
 
       return u;
 
      });
    
   } else {
-      
+     
     this._id = this.getNewID();
 
     users.push(this);
@@ -135,4 +139,23 @@ save(){
 
  }
 
+remove(){
+  
+  let users = User.getUsersStorage();
+
+  users.forEach((userData, index)=>{
+
+    if(this._id == userData._id){
+
+      users.splice(index, 1);
+
+     }
+
+    });
+   
+    //sessionStorage.setItem("users", JSON.stringify(users));
+   localStorage.setItem("users", JSON.stringify(users));
+
+  } 
+ 
 };
