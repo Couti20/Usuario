@@ -11,6 +11,7 @@ class UserController {
     this.selectAll();
 
   };
+
 onEdit(){
     
     document.querySelector("#box-user-update .btn-cancel").addEventListener("click", e=>{
@@ -20,6 +21,7 @@ onEdit(){
     });
 
     this.formUpdateEl.addEventListener("submit", event => {
+
       event.preventDefault();
 
       let btn = this.formUpdateEl.querySelector("[type=submit]");
@@ -40,14 +42,18 @@ onEdit(){
    this.getphoto(this.formUpdateEl).then(
     (content) => {
 
-   if (!values.photo) {result._photo = userOld._photo;
-     }else {
+   if (!values.photo)
+
+    {result._photo = userOld._photo;
+     } else {
        result._photo = content;
-     } 
+     } ;
 
-   let user = new user();
+   let user = new User();
 
-   user.loadFromJSON(result)
+   user.loadFromJSON(result);
+
+   user.save();
      
    this.getTr(user, tr);
 
@@ -85,7 +91,7 @@ onSubmit(){
         
             values.photo = content;
 
-            this.insert(values);
+            values.save();
 
             this.addLine(values );
 
@@ -219,16 +225,6 @@ selectAll(){
    
    }
 
-insert(data){
-
-    let users = this.getUsersStorage();
-
-    users.push(data);
-    //sessionStorage.setItem("users", JSON.stringify(users));
-    localStorage.setItem("users", JSON.stringify(users));
-
-  }
-
 addLine(dataUser) {
     /*condiçao == true/ //?entao //:sanão*/
    let tr = this.getTr(dataUser);
@@ -238,7 +234,7 @@ addLine(dataUser) {
               //appendch...adiciona no final//é um comando.
    this.updateCount();
 
-}
+};
 
 getTr(dataUser, tr = null){
 
